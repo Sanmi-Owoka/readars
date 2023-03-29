@@ -163,19 +163,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Attend to later
 # CORS HEADERS CONFIGURATION
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8000",
-    "http://127.0.0.1:8000"
-]
-
-CORS_ALLOW_METHODS = [
-    "DELETE",
-    "GET",
-    "OPTIONS",
-    "PATCH",
-    "POST",
-    "PUT",
-]
+CORS_ALLOW_ALL_ORIGINS = True
 
 CSRF_COOKIE_HTTPONLY = True
 
