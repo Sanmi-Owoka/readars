@@ -1,15 +1,19 @@
 from rest_framework import status, generics
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
-from .serializers import BookSerializer, UpdateBookSerializer, CreateBookSerializer
+from .serializers import BookSerializer, UpdateBookSerializer
 from django.core.exceptions import ObjectDoesNotExist
 from config.functools import paginate
 from django.db.models import Q
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
+from django.core.files import File
+from pathlib import Path
+import os, base64
 from rest_framework import filters
 from decimal import Decimal
 from .models import Book
+from config.functools import base64_to_data
 
 
 class BooksListView(generics.ListAPIView):
@@ -24,23 +28,35 @@ class BooksViewSet(GenericViewSet):
     serializer_class = BookSerializer
     queryset = Book.objects.all()
 
-    @action(detail=False, methods=["POST"], name='create book', serializer_class=CreateBookSerializer)
+    @action(detail=False, methods=["POST"], name='create book')
     def create_book(self, request):
         try:
             # create book endpoint
             user = request.user
             title = request.data["title"]
             description = request.data["description"]
-            thumbnail = request.data["thumbnail"]
-            serializer = self.serializer_class(data=request.data)
-            if not serializer.is_valid():
-                return Response(
-                    {
-                        "message": "failure",
-                        "data": "null",
-                        "errors": serializer.errors,
-                    }
-                    , status=status.HTTP_400_BAD_REQUEST)
+            thumbnail= request.data["thumbnail"]
+            doc = request.data["doc"]
+            if not title:
+                return Response({"message": ["title field is required"]}, status=status.HTTP_400_BAD_REQUEST)
+            if not description:
+                return Response({"message": ["description field is required"]}, status=status.HTTP_400_BAD_REQUEST)
+            if not thumbnail:
+                return Response({"message": ["thumbnail field is required"]}, status=status.HTTP_400_BAD_REQUEST)
+            if not doc:
+                return Response({"message": ["doc field is required"]}, status=status.HTTP_400_BAD_REQUEST)
+            
+            thumbnail = base64_to_data(thumbnail)
+            decodedData = base64.b64decode(doc, validate=True)
+            if decodedData[0:4] != b'%PDF':
+                print('Missing the PDF file signature')
+                pass
+            pdf_file = open("test.pdf", "wb")
+            pdf_file.write(decodedData)
+            pdf_file.close()
+            the_file_path = Path(__file__).resolve().parent.parent
+            the_file = os.path.join(the_file_path, "test.pdf")
+
 
             if Book.objects.filter(title=title).exists():
                 return Response({"message": ["Book with title already exits"]}, status=status.HTTP_400_BAD_REQUEST)
@@ -50,7 +66,15 @@ class BooksViewSet(GenericViewSet):
                 thumbnail=thumbnail,
                 author=user
             )
-            response = BookSerializer(new_book)
+            with open(the_file, "rb") as csv:
+                new_book.doc.save(the_file, File(csv))
+            try:
+                # pass
+                os.remove("test.pdf")
+                print("file deleted")
+            except:
+                pass
+            response = self.get_serializer(new_book)
             return Response(response.data, status=status.HTTP_201_CREATED)
         except KeyError as e:
             print("error", e)

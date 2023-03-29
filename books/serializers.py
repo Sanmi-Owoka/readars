@@ -6,8 +6,6 @@ from users.serializers.authentication_serializers import UserSerializer
 class CreateBookSerializer(serializers.ModelSerializer):
     title = serializers.CharField(max_length=68, min_length=1)
     description = serializers.CharField(max_length=2555, min_length=1)
-    doc = serializers.FileField(allow_empty_file=False, use_url=False)
-    thumbnail = serializers.ImageField(allow_empty_file=False, use_url=False)
     
     class Meta:
         model = Book
