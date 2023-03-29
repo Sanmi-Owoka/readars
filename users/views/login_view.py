@@ -46,6 +46,9 @@ class LoginView(generics.GenericAPIView):
             return Response({
                 "message": "Success",
                 "data": {
+                    "email": user.email,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
                     "token": str(auth_token.access_token),
                 },
                 "errors": "null"
