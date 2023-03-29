@@ -12,8 +12,10 @@ from pathlib import Path
 import os, base64
 from rest_framework import filters
 from decimal import Decimal
-from .models import Book
+from .models import Book, UserSubscription
 from config.functools import base64_to_data
+from users.models import User
+from users.serializers.authentication_serializers import UserSerializer
 
 
 class BooksListView(generics.ListAPIView):
@@ -36,27 +38,16 @@ class BooksViewSet(GenericViewSet):
             title = request.data["title"]
             description = request.data["description"]
             thumbnail= request.data["thumbnail"]
-            doc = request.data["doc"]
+            
             if not title:
                 return Response({"message": ["title field is required"]}, status=status.HTTP_400_BAD_REQUEST)
             if not description:
                 return Response({"message": ["description field is required"]}, status=status.HTTP_400_BAD_REQUEST)
             if not thumbnail:
                 return Response({"message": ["thumbnail field is required"]}, status=status.HTTP_400_BAD_REQUEST)
-            if not doc:
-                return Response({"message": ["doc field is required"]}, status=status.HTTP_400_BAD_REQUEST)
+            
             
             thumbnail = base64_to_data(thumbnail)
-            decodedData = base64.b64decode(doc, validate=True)
-            if decodedData[0:4] != b'%PDF':
-                print('Missing the PDF file signature')
-                pass
-            pdf_file = open("test.pdf", "wb")
-            pdf_file.write(decodedData)
-            pdf_file.close()
-            the_file_path = Path(__file__).resolve().parent.parent
-            the_file = os.path.join(the_file_path, "test.pdf")
-
 
             if Book.objects.filter(title=title).exists():
                 return Response({"message": ["Book with title already exits"]}, status=status.HTTP_400_BAD_REQUEST)
@@ -66,14 +57,7 @@ class BooksViewSet(GenericViewSet):
                 thumbnail=thumbnail,
                 author=user
             )
-            with open(the_file, "rb") as csv:
-                new_book.doc.save(the_file, File(csv))
-            try:
-                # pass
-                os.remove("test.pdf")
-                print("file deleted")
-            except:
-                pass
+            
             response = self.get_serializer(new_book)
             return Response(response.data, status=status.HTTP_201_CREATED)
         except KeyError as e:
@@ -186,6 +170,22 @@ class BooksViewSet(GenericViewSet):
         except Exception as e:
             print("error", e)
             return Response({"message": [f"{e}"]}, status=status.HTTP_400_BAD_REQUEST)
+        
 
+    @action(detail=False, methods=["POST"], name='subscribe user')
+    def create_user_subscription(self, request):
+        try:
+            user = request.user
+            user.is_subcribed = True
+            user = UserSubscription.objects.create(
+                user=user,
+            )
+            user.save()
+            response = UserSerializer(user)
+            return Response({"message": "user successfully subscribed"}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print("error", e)
+            return Response({"message": [f"{e}"]}, status=status.HTTP_400_BAD_REQUEST)
 
 # Create your views here.

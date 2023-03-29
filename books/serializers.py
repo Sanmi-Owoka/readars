@@ -43,7 +43,7 @@ class BookSerializer(serializers.ModelSerializer):
             "created_at"
         ]
 
-    def get_cover_image(self, instance):
+    def get_thumbnail(self, instance):
         try:
             return self.context["request"].build_absolute_uri(instance.thumbnail.url)
         except:
