@@ -16,7 +16,6 @@ import urllib.parse as up
 import environ
 from dotenv import load_dotenv
 import dj_database_url
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
@@ -25,7 +24,18 @@ ROOT_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 APPS_DIR = BASE_DIR / "config"
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
+env = environ.Env()
 
+READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
+if not READ_DOT_ENV_FILE:
+    # Operating System Environment variables have precedence over variables defined in the .env file,
+    # that is to say variables from the .env files will only be used if not defined
+    # as environment variables.
+    config_path = Path(__file__).resolve().parent.parent
+    env_file = os.path.join(config_path, ".env")
+    print("Loading : {}".format(env_file))
+    env.read_env(env_file)
+    print("The .env file has been loaded. See common.py for more information")
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
 # Quick-start development settings - unsuitable for production
