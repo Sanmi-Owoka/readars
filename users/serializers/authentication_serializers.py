@@ -6,8 +6,8 @@ class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=68, min_length=6, write_only=True)
     confirm_password = serializers.CharField(max_length=68, min_length=6, write_only=True)
     email = serializers.EmailField(required=True)
-    first_name = serializers.CharField(max_length=68, min_length=6)
-    last_name = serializers.CharField(max_length=68, min_length=6)
+    first_name = serializers.CharField(max_length=68, min_length=1)
+    last_name = serializers.CharField(max_length=68, min_length=1)
 
     class Meta:
         model = User
