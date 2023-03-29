@@ -57,6 +57,7 @@ class BooksViewSet(GenericViewSet):
                 thumbnail=thumbnail,
                 author=user
             )
+            new_book.save()
             
             response = self.get_serializer(new_book)
             return Response(response.data, status=status.HTTP_201_CREATED)
@@ -108,10 +109,10 @@ class BooksViewSet(GenericViewSet):
     def get_book(self, request):
         try:
             # endpoint to get specifi book details
-            user = request.user
+            
             book_id = request.GET.get('id')
             try:
-                get_book_obj = Book.objects.get(author=user, id=book_id)
+                get_book_obj = Book.objects.get(id=book_id)
             except ObjectDoesNotExist:
                 return Response({"message": [f"book with id: {book_id} does not exists"]}
                                 , status=status.HTTP_404_NOT_FOUND)
