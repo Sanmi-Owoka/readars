@@ -6,6 +6,8 @@ class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=68, min_length=6, write_only=True)
     confirm_password = serializers.CharField(max_length=68, min_length=6, write_only=True)
     email = serializers.EmailField(required=True)
+    first_name = serializers.CharField(max_length=68, min_length=6)
+    last_name = serializers.CharField(max_length=68, min_length=6)
 
     class Meta:
         model = User
@@ -13,6 +15,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             "email",
             "password",
             "confirm_password",
+            "first_name",
+            "last_name"
         ]
 
     def validate(self, attrs):

@@ -32,6 +32,8 @@ class RegisterView(generics.GenericAPIView):
 
             user = User.objects.create(
                 email=serializer.validated_data["email"].lower().strip(),
+                first_name = serializer.validated_data["first_name"].lower().strip(),
+                last_name = serializer.validated_data["last_name"].lower().strip()
             )
             user.set_password(serializer.validated_data["password"])
             user.save()
