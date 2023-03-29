@@ -7,6 +7,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, Spec
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/v1/users/",include("users.urls")),
+    path("books/", include("books.urls")),
     path("api/v1/", include("config.api_router")),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

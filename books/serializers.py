@@ -19,7 +19,6 @@ class CreateBookSerializer(serializers.ModelSerializer):
 class BookSerializer(serializers.ModelSerializer):
     author = UserSerializer()
     thumbnail = serializers.SerializerMethodField()
-    doc = serializers.SerializerMethodField()
 
     class Meta:
         model = Book
@@ -29,7 +28,6 @@ class BookSerializer(serializers.ModelSerializer):
             "description",
             "author",
             "thumbnail",
-            "doc",
             "updated_at",
             "created_at"
         ]
@@ -48,12 +46,7 @@ class BookSerializer(serializers.ModelSerializer):
             return self.context["request"].build_absolute_uri(instance.thumbnail.url)
         except:
             return None
-        
-    def get_doc(self, instance):
-        try:
-            return self.context["request"].build_absolute_uri(instance.doc.url)
-        except:
-            return None
+    
 
 
 class UpdateBookSerializer(serializers.ModelSerializer):

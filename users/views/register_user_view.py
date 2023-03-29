@@ -45,6 +45,7 @@ class RegisterView(generics.GenericAPIView):
                     "email": serializer.validated_data["email"].lower().strip(),
                     "first_name": serializer.validated_data["first_name"].lower().strip(),
                     "last_name": serializer.validated_data["last_name"].lower().strip(),
+                    "is_subscribed": user.is_subscribed,
                     "token": str(auth_token.access_token),
                 },
                 "errors": "null"
